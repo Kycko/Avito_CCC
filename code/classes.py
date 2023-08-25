@@ -7,13 +7,20 @@ from tkinter   import Text, Tk, WORD
 class File():
     def __init__(self, file):
         self.data = read_file(file)
+        self.CS   = {}              # CS = call statuses
+        for line in self.data:
+            L = line['Статус звонка']
+            if L in self.CS.keys():
+                self.CS[L] += 1
+            else:
+                self.CS[L]  = 0
 
 class Window(Tk):
     def __init__(self, msg):
         super().__init__()
         self.resizable(0,0)
         self.title('Avito call center counter')
-        text = Text(self, height=20, width=60, padx=3, font='Consolas 14', wrap=WORD)
+        text = Text(self, height=20, width=60, padx=3, font='Consolas 13', wrap=WORD)
         text.pack(padx=5, pady=5)
         text.insert(1.0, msg)
         self.bind_all('<Key>', self._onKeyRelease, '+')
