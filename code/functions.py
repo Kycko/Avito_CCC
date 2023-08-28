@@ -26,28 +26,37 @@ def sum_dicts(final, cur):
 
 # Counting etc.
 def count_final_numbers(files):
-    data = {'total' : 0,
-            'CS'    : {},
-            'SS'    : {}}
+    data = {'total'    : 0,
+            'CS'       : {},
+            'SS'       : {},
+            'cars'     : {},
+            'goods'    : {},
+            'services' : {}}
     for file in files:
-        data['total'] += len      (file.data)
-        data['CS']     = sum_dicts(data['CS'], file.CS)
-        data['SS']     = sum_dicts(data['SS'], file.SS)
+        data['total']   += len      (file.data)
+        data['CS']       = sum_dicts(data['CS'],       file.CS)
+        data['SS']       = sum_dicts(data['SS'],       file.SS)
+        data['cars']     = sum_dicts(data['cars'],     file.cars)
+        data['goods']    = sum_dicts(data['goods'],    file.goods)
+        data['services'] = sum_dicts(data['services'], file.services)
     return data
 def construct_final_msg(data):
     lines      = ['-Всего контактов за день: ' + str(data['total'])]
-    status_len = 42
+    status_len = 50
 
     if data['CS']:
-        lines, status_len = final_msg_add_dict('-Статусы звонков:',
-                                               lines,
-                                               data['CS'],
-                                               status_len)
+        lines = final_msg_add_dict('-Статусы звонков:',                          lines, data['CS'], status_len)
     if data['SS']:
-        lines, status_len = final_msg_add_dict('-Конечные категории для "опрос состоялся":',
-                                               lines,
-                                               data['SS'],
-                                               status_len)
+        lines = final_msg_add_dict('-Конечные категории для "опрос состоялся":', lines, data['SS'], status_len)
+
+    lines.append('-' * status_len)
+    if data['cars']:
+        lines.append('-' * status_len)
+        lines.append('-Согласия в автосервисах: ' + str(data['cars']['Автосервис']))
+    if data['goods']:
+        lines = final_msg_add_dict('-Согласия в товарах:', lines, data['goods'],    status_len)
+    if data['services']:
+        lines = final_msg_add_dict('-Согласия в услугах:', lines, data['services'], status_len)
 
     for i in range(len(lines)):
         list = lines[i].split(' ')
@@ -69,7 +78,5 @@ def final_msg_add_dict(title, lines, dict, status_len):
     lines.append(title)
     for key in sorted(dict.keys()):
         msg = ' -' + key + ': ' + str(dict[key])
-        if len(msg) > status_len:
-            status_len = len(msg)
         lines.append(msg)
-    return lines, status_len
+    return lines

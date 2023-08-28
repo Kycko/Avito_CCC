@@ -6,23 +6,37 @@ from tkinter   import Text, Tk, WORD
 
 class File():
     def __init__(self, file):
-        self.data = read_file(file)
-        self.CS   = {}              # CS = call statuses
-        self.SS   = {}              # SS = successful survey
+        self.data     = read_file(file)
+        self.CS       = {}              # CS = call statuses
+        self.SS       = {}              # SS = successful survey
+
+        self.cars     = {}              # автосервисы
+        self.goods    = {}
+        self.services = {}
 
         for line in self.data:
-            L       = line['Статус звонка']
-            self.CS = dict_counter(self.CS, L)
-            if L == 'Опрос состоялся':
-                self.SS = dict_counter(self.SS, line['Конечная категория'])
+            CS        = line['Статус звонка']
+            SS        = line['Конечная категория']
+            goods     = line['Категория клиента от КЦ (товары)']
+            services  = line['Категория клиента от КЦ (услуги)']
 
+            self.CS = dict_counter(self.CS, CS)
+            if CS == 'Опрос состоялся':
+                self.SS = dict_counter(self.SS, SS)
+            if SS == 'Согласие':
+                if goods   == 'Автосервис':
+                    self.cars     = dict_counter(self.cars,     goods)
+                elif goods == 'Ответ не сохранен':
+                    self.services = dict_counter(self.services, services)
+                else:
+                    self.goods    = dict_counter(self.goods,    goods)
 
 class Window(Tk):
     def __init__(self, msg):
         super().__init__()
-        self.resizable(0,0)
+        self.attributes('-topmost', True)
         self.title('Avito call center counter')
-        text = Text(self, height=20, width=60, padx=3, font='Consolas 13', wrap=WORD)
+        text = Text(self, height=35, width=51, padx=3, font='Consolas 13', wrap=WORD)
         text.pack(padx=5, pady=5)
         text.insert(1.0, msg)
         self.bind_all('<Key>', self._onKeyRelease, '+')
