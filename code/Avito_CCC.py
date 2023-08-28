@@ -9,5 +9,6 @@ files = []
 for file in askopenfilenames():
     files.append(File(file))
 
-window = Window(construct_final_msg(count_final_numbers(files)))
-window.mainloop()
+if files:
+    window = Window(construct_final_msg(count_final_numbers(files)))
+    window.mainloop()
