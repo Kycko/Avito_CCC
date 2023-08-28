@@ -9,31 +9,46 @@ def read_file(file):
     for row in DictReader(open(file), delimiter=';'):
         data.append(row)
     return data
+def dict_counter(dict, key):
+    if key in dict.keys():
+        dict[key] += 1
+    else:
+        dict[key]  = 1
+    return dict
+def sum_dicts(final, cur):
+    for key in cur.keys():
+        if key:             # just to avoid showing blank '' counter
+            if key in final.keys():
+                final[key] += cur[key]
+            else:
+                final[key]  = cur[key]
+    return final
 
 # Counting etc.
 def count_final_numbers(files):
     data = {'total' : 0,
-            'CS'    : {}}
+            'CS'    : {},
+            'SS'    : {}}
     for file in files:
-        data['total'] += len(file.data)
-        for key in file.CS.keys():
-            if key:
-                if key not in data['CS'].keys():
-                    data['CS'][key] = 0
-                data['CS'][key] += file.CS[key]
+        data['total'] += len      (file.data)
+        data['CS']     = sum_dicts(data['CS'], file.CS)
+        data['SS']     = sum_dicts(data['SS'], file.SS)
     return data
 def construct_final_msg(data):
-    lines = ['-Всего контактов за день: ' + str(data['total'])]
-    lines.append('-' * len(lines[0]))
+    lines      = ['-Всего контактов за день: ' + str(data['total'])]
+    status_len = 42
 
-    lines.append('-Статусы звонков:')
-    arr_index  = len(lines)
-    status_len = len(lines[0])
-    for key in sorted(data['CS'].keys()):
-        msg = ' -' + key + ': ' + str(data['CS'][key])
-        if len(msg) > status_len:
-            status_len = len(msg)
-        lines.append(msg)
+    if data['CS']:
+        lines, status_len = final_msg_add_dict('-Статусы звонков:',
+                                               lines,
+                                               data['CS'],
+                                               status_len)
+    if data['SS']:
+        lines, status_len = final_msg_add_dict('-Конечные категории для "опрос состоялся":',
+                                               lines,
+                                               data['SS'],
+                                               status_len)
+
     for i in range(len(lines)):
         list = lines[i].split(' ')
         try:
@@ -49,3 +64,12 @@ def construct_final_msg(data):
             msg += '\n'
         msg += line
     return msg
+def final_msg_add_dict(title, lines, dict, status_len):
+    lines.append('-' * status_len)
+    lines.append(title)
+    for key in sorted(dict.keys()):
+        msg = ' -' + key + ': ' + str(dict[key])
+        if len(msg) > status_len:
+            status_len = len(msg)
+        lines.append(msg)
+    return lines, status_len

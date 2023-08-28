@@ -1,19 +1,21 @@
 ### Anthony Samartsev <ant.samarcev@gmail.com>
 ### GNU GPL 3 or higher; http://www.gnu.org/licenses/gpl.html
 
-from functions import read_file
+from functions import dict_counter, read_file
 from tkinter   import Text, Tk, WORD
 
 class File():
     def __init__(self, file):
         self.data = read_file(file)
         self.CS   = {}              # CS = call statuses
+        self.SS   = {}              # SS = successful survey
+
         for line in self.data:
-            L = line['Статус звонка']
-            if L in self.CS.keys():
-                self.CS[L] += 1
-            else:
-                self.CS[L]  = 0
+            L       = line['Статус звонка']
+            self.CS = dict_counter(self.CS, L)
+            if L == 'Опрос состоялся':
+                self.SS = dict_counter(self.SS, line['Конечная категория'])
+
 
 class Window(Tk):
     def __init__(self, msg):
