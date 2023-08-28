@@ -27,8 +27,21 @@ def construct_final_msg(data):
     lines.append('-' * len(lines[0]))
 
     lines.append('-Статусы звонков:')
+    arr_index  = len(lines)
+    status_len = len(lines[0])
     for key in sorted(data['CS'].keys()):
-        lines.append(' -' + key + ': ' + str(data['CS'][key]))
+        msg = ' -' + key + ': ' + str(data['CS'][key])
+        if len(msg) > status_len:
+            status_len = len(msg)
+        lines.append(msg)
+    for i in range(len(lines)):
+        list = lines[i].split(' ')
+        try:
+            int(list[-1])
+            list[-2] += ' ' * (status_len - len(lines[i]))
+            lines[i]  = ' '.join(list)
+        except:
+            list = ''
 
     msg = ''
     for line in lines:
