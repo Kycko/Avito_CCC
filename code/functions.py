@@ -2,6 +2,7 @@
 ### GNU GPL 3 or higher; http://www.gnu.org/licenses/gpl.html
 
 from csv import DictReader
+from datetime  import datetime
 
 # Common functions
 def read_file(file):
@@ -26,14 +27,19 @@ def sum_dicts(final, cur):
 
 # Counting etc.
 def count_final_numbers(files):
-    data = {'total'    : 0,
+    data = {'max_date' : files[0].max_date,
+            'total'    : 0,
             'CS'       : {},
             'SS'       : {},
             'cars'     : {},
             'goods'    : {},
             'services' : {}}
     for file in files:
-        data['total']   += len      (file.data)
+        if file.max_date > data['max_date']:
+            data['max_date'] = file.max_date
+    for file in files:
+        if file.max_date == data['max_date']:
+            data['total'] += len(file.data)
         data['CS']       = sum_dicts(data['CS'],       file.CS)
         data['SS']       = sum_dicts(data['SS'],       file.SS)
         data['cars']     = sum_dicts(data['cars'],     file.cars)
@@ -41,8 +47,13 @@ def count_final_numbers(files):
         data['services'] = sum_dicts(data['services'], file.services)
     return data
 def construct_final_msg(data):
-    lines      = ['-Всего контактов за день: ' + str(data['total'])]
-    status_len = 50
+    if data['max_date'] == datetime.today().date():
+        temp = 'СЕГОДНЯ'
+    else:
+        temp = data['max_date'].strftime('%d.%m.%Y')
+
+    lines      = ['-Всего контактов за ' + temp + ': ' + str(data['total'])]
+    status_len = 54
 
     if data['CS']:
         lines = final_msg_add_dict('-Статусы звонков:',                          lines, data['CS'], status_len)

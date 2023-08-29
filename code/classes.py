@@ -1,24 +1,39 @@
 ### Anthony Samartsev <ant.samarcev@gmail.com>
 ### GNU GPL 3 or higher; http://www.gnu.org/licenses/gpl.html
 
+from datetime  import date, datetime
 from functions import dict_counter, read_file
 from tkinter   import Text, Tk, WORD
 
 class File():
     def __init__(self, file):
-        self.data     = read_file(file)
-        self.CS       = {}              # CS = call statuses
-        self.SS       = {}              # SS = successful survey
+        self.init_data = read_file(file)
+        self.data      = []
+        self.max_date  = date(2023, 1, 1)
 
-        self.cars     = {}              # автосервисы
-        self.goods    = {}
-        self.services = {}
+        self.CS        = {}     # CS = call statuses
+        self.SS        = {}     # SS = successful survey
+        self.cars      = {}     # автосервисы
+        self.goods     = {}
+        self.services  = {}
+
+        # filter only today calls
+        str = 'Время начала звонка'
+        for line in self.init_data:
+            if line[str]:
+                line[str] = datetime.strptime(line[str], '%Y-%m-%d %H:%M:%S')
+                cur       = line[str].date()
+                if cur > self.max_date:
+                    self.max_date = cur
+        for line in self.init_data:
+            if line[str] and line[str].date() == self.max_date:
+                self.data.append(line)
 
         for line in self.data:
-            CS        = line['Статус звонка']
-            SS        = line['Конечная категория']
-            goods     = line['Категория клиента от КЦ (товары)']
-            services  = line['Категория клиента от КЦ (услуги)']
+            CS         = line['Статус звонка']
+            SS         = line['Конечная категория']
+            goods      = line['Категория клиента от КЦ (товары)']
+            services   = line['Категория клиента от КЦ (услуги)']
 
             self.CS = dict_counter(self.CS, CS)
             if CS == 'Опрос состоялся':
@@ -36,7 +51,7 @@ class Window(Tk):
         super().__init__()
         self.attributes('-topmost', True)
         self.title('Avito call center counter')
-        text = Text(self, height=35, width=51, padx=3, font='Consolas 13', wrap=WORD)
+        text = Text(self, height=35, width=54, padx=3, font='Consolas 13', wrap=WORD)
         text.pack(padx=5, pady=5)
         text.insert(1.0, msg)
         self.bind_all('<Key>', self._onKeyRelease, '+')
