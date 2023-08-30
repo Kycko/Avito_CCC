@@ -50,8 +50,9 @@ class Window(Tk):
     def __init__(self, msg):
         super().__init__()
         self.attributes('-topmost', True)
+        self.resizable(0,0)
         self.title('Avito call center counter')
-        text = Text(self, height=35, width=54, padx=3, font='Consolas 13', wrap=WORD)
+        text = Text(self, height=34, width=54, padx=3, font='Consolas 13', wrap=WORD)
         text.pack(padx=5, pady=5)
         text.insert(1.0, msg)
         self.bind_all('<Key>', self._onKeyRelease, '+')
