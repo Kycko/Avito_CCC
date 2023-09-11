@@ -53,16 +53,15 @@ def construct_final_msg(data):
         temp = data['max_date'].strftime('%d.%m.%Y')
 
     lines      = ['-Всего контактов за ' + temp + ': ' + str(data['total'])]
-    status_len = 54
+    status_len = 60
 
     if data['CS']:
         lines = final_msg_add_dict('-Статусы звонков:',                          lines, data['CS'], status_len)
     if data['SS']:
-        lines = final_msg_add_dict('-Конечные категории для "опрос состоялся":', lines, data['SS'], status_len)
+        lines = final_msg_add_dict('-Конечные катег. для "опрос состоялся" и "дозвон успешный":', lines, data['SS'], status_len)
 
-    lines.append('-' * status_len)
+    lines.append('/' * status_len)
     if data['cars']:
-        lines.append('-' * status_len)
         lines.append('-Согласия в автосервисах: ' + str(data['cars']['Автосервис']))
     if data['goods']:
         lines = final_msg_add_dict('-Согласия в товарах:', lines, data['goods'],    status_len)

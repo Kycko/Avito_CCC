@@ -36,7 +36,7 @@ class File():
             services   = line['Категория клиента от КЦ (услуги)']
 
             self.CS = dict_counter(self.CS, CS)
-            if CS == 'Опрос состоялся':
+            if CS in ('Опрос состоялся', 'Дозвон успешный'):
                 self.SS = dict_counter(self.SS, SS)
             if SS == 'Согласие':
                 if goods   == 'Автосервис':
@@ -52,7 +52,7 @@ class Window(Tk):
         self.attributes('-topmost', True)
         self.resizable(0,0)
         self.title('Avito call center counter')
-        text = Text(self, height=34, width=54, padx=3, font='Consolas 13', wrap=WORD)
+        text = Text(self, height=34, width=60, padx=3, font='Consolas 13', wrap=WORD)
         text.pack(padx=5, pady=5)
         text.insert(1.0, msg)
         self.bind_all('<Key>', self._onKeyRelease, '+')
