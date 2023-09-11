@@ -62,6 +62,7 @@ def construct_final_msg(data):
 
     lines.append('/' * status_len)
     if data['cars']:
+        lines.append('-' * status_len)
         lines.append('-Согласия в автосервисах: ' + str(data['cars']['Автосервис']))
     if data['goods']:
         lines = final_msg_add_dict('-Согласия в товарах:', lines, data['goods'],    status_len)
@@ -87,6 +88,9 @@ def final_msg_add_dict(title, lines, dict, status_len):
     lines.append('-' * status_len)
     lines.append(title)
     for key in sorted(dict.keys()):
-        msg = ' -' + key + ': ' + str(dict[key])
+        msg = ' -' + key + ': '
+        if key in ('Дозвон успешный', 'Опрос состоялся', 'Согласие'):
+            msg += ' '*(15-len(key)) + '       → → →               → → → '
+        msg += str(dict[key])
         lines.append(msg)
     return lines
